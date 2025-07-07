@@ -118,7 +118,20 @@ class ZendeskMessagingModule(private val reactContext: ReactApplicationContext) 
 
     module.showMessaging(reactContext, Intent.FLAG_ACTIVITY_NEW_TASK)
 
+    Handler(Looper.getMainLooper()).postDelayed({
+      val activity = currentActivity ?: return@postDelayed
+      val rootView = activity.window?.decorView?.findViewById<View>(android.R.id.content)
+      val statusBarHeight = getStatusBarHeight(activity)
+
+      rootView?.setPadding(0, statusBarHeight, 0, 0)
+    }, 500)
+
     promise.resolve(null)
+  }
+
+  private fun getStatusBarHeight(context: Context): Int {
+    val resourceId = context.resources.getIdentifier("status_bar_height", "dimen", "android")
+    return if (resourceId > 0) context.resources.getDimensionPixelSize(resourceId) else 0
   }
 
   @ReactMethod
